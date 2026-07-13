@@ -6,6 +6,7 @@ import { AuthDto } from 'src/dtos/auth.dto';
 import { AssetEditActionItem } from 'src/dtos/editing.dto';
 import { SourceTypeSchema } from 'src/enum';
 import { AssetFaceTable } from 'src/schema/tables/asset-face.table';
+import { FaceClusterTable } from 'src/schema/tables/face-cluster.table';
 import { ImageDimensions, MaybeDehydrated } from 'src/types';
 import { asDateString, asDateTimeString } from 'src/utils/date';
 import { transformFaceBoundingBox } from 'src/utils/transform';
@@ -24,7 +25,11 @@ const PersonCreateSchema = z
       .describe('Person date of birth'),
     isHidden: z.boolean().optional().describe('Person visibility (hidden)'),
     isFavorite: z.boolean().optional().describe('Mark as favorite'),
-    color: hexColor.nullable().optional().describe('Person color (hex)'),
+    color: hexColor
+      .nullable()
+      .optional()
+      .describe('Person color (hex)')
+      .meta(new HistoryBuilder().deprecated('v3.1.0').getExtensions()),
   })
   .meta({ id: 'PersonCreateDto' });
 
@@ -179,7 +184,6 @@ export function mapPerson(person: MaybeDehydrated<Person>): PersonResponseDto {
     thumbnailPath: person.thumbnailPath,
     isHidden: person.isHidden,
     isFavorite: person.isFavorite,
-    color: person.color ?? undefined,
     updatedAt: asDateTimeString(person.updatedAt),
   };
 }
